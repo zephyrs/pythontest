@@ -3,6 +3,7 @@ penalty shooting
 '''
 import random
 import sqlite3
+import copy
 from enum import Enum, unique
 from shooter import PlayerShooter, ComputerShooter, DEFAULT_PLAY_ROUNDS
 
@@ -45,19 +46,27 @@ class ShootoutGame():
 
         i = 0
         while True:
-            self.shooting_action(shooters[i % 2], shooters[(i + 1) % 2])
-            result = self.judge_score(shooters)
+            attacking_side = shooters[i % 2]
+            defending_side = shooters[(i + 1) % 2]
+            matchpoint = ShootoutGame.is_match_point(
+                (attacking_side, defending_side))
+            self.shooting_action(attacking_side, defending_side, matchpoint)
+            print('(Round %d)    %s:%s - %d:%d' %
+                  (attacking_side.round, attacking_side.name,
+                   defending_side.name, attacking_side.score,
+                   defending_side.score))
+            result = ShootoutGame.judge_score(shooters)
+            shooters[0].display_result()
+            shooters[1].display_result()
+
             if result != GameResult.Draw:
-                print('you win!!!' if result ==
-                      GameResult.PlayerWin else 'you lose!!!')
+                print('YOU WIN!!!' if result ==
+                      GameResult.PlayerWin else 'YOU LOSE!!!')
                 break
             i += 1
 
         print('The final score is %d:%d (%d rounds)' %
               (shooters[0].score, shooters[1].score, shooters[0].round))
-
-        shooters[0].display_result()
-        shooters[1].display_result()
 
     def toss_coin(self):
         toss_map = {0: ('h', 'Head'), 1: ('t', 'Tail')}
@@ -72,7 +81,7 @@ class ShootoutGame():
         else:
             print('Sorry you lose! Computer will shoot first!')
 
-    def shooting_action(self, shooter, keeper):
+    def shooting_action(self, shooter, keeper, matchpoint):
         direction_list = ['l', 'm', 'r']
         directions_map = {'l': 'left', 'm': 'middle', 'r': 'right'}
         shoot_choise = ''
@@ -80,6 +89,24 @@ class ShootoutGame():
         while True:
             print('%s is stepping up to take the penalty...' %
                   shooter.taker_name)
+            if matchpoint > 0:
+                print(
+                    random.choice([
+                        'The keeper has to stop it...',
+                        'The stress is now on the keeper...',
+                        'If only he can score...',
+                        'The game will end if he scores...',
+                        'He needs a goal to end the match...'
+                    ]))
+            elif matchpoint < 0:
+                print(
+                    random.choice([
+                        'He must score...', 'The keeper could be a hero if...',
+                        'SCORE or LOSE...',
+                        'He has to score to keep the game going on...',
+                        'He seems quite nervous at the penalty spot...'
+                    ]))
+
             if (isinstance(shooter, PlayerShooter)):
                 shoot_choise = input(
                     'Your shooting turn... choose from (\'l\', \'m\', \'r\') --> '
@@ -147,8 +174,6 @@ class ShootoutGame():
     @staticmethod
     def judge_score(s):
         s1, s2 = s[0], s[1]
-        print('(Round %d)    %s:%s - %d:%d' %
-              (s1.round, s1.name, s2.name, s1.score, s2.score))
         player, com = s1, s2
         if isinstance(s1, ComputerShooter):
             player, com = s2, s1
@@ -171,6 +196,25 @@ class ShootoutGame():
                 elif com.score > DEFAULT_PLAY_ROUNDS - player.round + player.score:
                     return GameResult.ComputerWin
         return GameResult.Draw
+
+    @staticmethod
+    def is_match_point(s):
+        shooter, keeper = s[0], s[1]
+        shooter_scored = copy.deepcopy(shooter)
+        shooter_scored.shoot(True)
+
+        if ShootoutGame.judge_score(
+            (shooter_scored, keeper)) != GameResult.Draw:
+            return 1
+
+        shooter_not_scored = copy.deepcopy(shooter)
+        shooter_not_scored.shoot(False)
+
+        if ShootoutGame.judge_score(
+            (shooter_not_scored, keeper)) != GameResult.Draw:
+            return -1
+
+        return 0
 
 
 if __name__ == "__main__":
