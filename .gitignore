@@ -1,3 +1,7 @@
+# custom defines
+.vscode/
+players.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -125,6 +129,3 @@ dmypy.json
 # temp files or backup files
 *.py~
 *.un~
-
-# custom db files
-players.db
