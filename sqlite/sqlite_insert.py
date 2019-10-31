@@ -1,6 +1,6 @@
-import sqlite3
-import random
 import datetime
+import random
+import sqlite3
 
 conn = sqlite3.connect('d:\\dump\\sc.db')
 c = conn.cursor()
@@ -27,5 +27,3 @@ while counter < 100000:
 conn.commit()
 c.close()
 conn.close()
-
-print("CLOSE database successfully")
