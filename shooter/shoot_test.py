@@ -1,9 +1,10 @@
-import unittest
 import random
-from shooter import PlayerShooter, ComputerShooter
-from penalty_shoot import GameResult, ShootoutGame
-import time
 import sqlite3
+import time
+import unittest
+
+from penalty_shoot import GameResult, ShootoutGame
+from shooter import ComputerShooter, PlayerShooter
 
 
 class TestPenaltyCase(unittest.TestCase):

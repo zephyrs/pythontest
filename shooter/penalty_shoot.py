@@ -1,11 +1,12 @@
 r'''
 penalty shooting
 '''
+import copy
 import random
 import sqlite3
-import copy
 from enum import Enum, unique
-from shooter import PlayerShooter, ComputerShooter, DEFAULT_PLAY_ROUNDS
+
+from shooter import DEFAULT_PLAY_ROUNDS, ComputerShooter, PlayerShooter
 
 
 @unique
@@ -72,7 +73,7 @@ class ShootoutGame():
         toss_map = {0: ('h', 'Head'), 1: ('t', 'Tail')}
         player_choise = input(
             'Coin tossing... choose Head(\'h\') or Tail(\'t\')) --> ').rstrip(
-            )
+        )
         toss_result = random.randrange(2)
         print('Toss result is %s...' % toss_map[toss_result][1])
         self._is_player_right = player_choise == toss_map[toss_result][0]
@@ -204,14 +205,14 @@ class ShootoutGame():
         shooter_scored.shoot(True)
 
         if ShootoutGame.judge_score(
-            (shooter_scored, keeper)) != GameResult.Draw:
+                (shooter_scored, keeper)) != GameResult.Draw:
             return 1
 
         shooter_not_scored = copy.deepcopy(shooter)
         shooter_not_scored.shoot(False)
 
         if ShootoutGame.judge_score(
-            (shooter_not_scored, keeper)) != GameResult.Draw:
+                (shooter_not_scored, keeper)) != GameResult.Draw:
             return -1
 
         return 0
