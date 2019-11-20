@@ -1,5 +1,5 @@
-SYMBOL_SCORE = 'o'
-SYMBOL_MISS = 'x'
+SYMBOL_SCORE = "o"
+SYMBOL_MISS = "x"
 DEFAULT_PLAY_ROUNDS = 5
 
 
@@ -10,15 +10,15 @@ class Shooter(object):
         self._players = players
 
     def display_result(self):
-        output = [self._name + ': ']
+        output = [self._name + ": "]
         for x in self._record:
-            output.append(x + ' ')
+            output.append(x + " ")
 
         i = DEFAULT_PLAY_ROUNDS - len(self._record)
         while i > 0:
-            output.append('- ')
+            output.append("- ")
             i -= 1
-        print(''.join(output))
+        print("".join(output))
 
     def shoot(self, scored):
         self._record.append(SYMBOL_SCORE if scored else SYMBOL_MISS)
@@ -54,9 +54,9 @@ class Shooter(object):
 
 class PlayerShooter(Shooter):
     def __init__(self, players):
-        super(PlayerShooter, self).__init__('YOU', players)
+        super(PlayerShooter, self).__init__("YOU", players)
 
 
 class ComputerShooter(Shooter):
     def __init__(self, players):
-        super(ComputerShooter, self).__init__('COM', players)
+        super(ComputerShooter, self).__init__("COM", players)
