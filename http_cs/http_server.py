@@ -1,15 +1,29 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
-
-HOST_NAME = '192.168.70.161'
-PORT_NUMBER = 9012
-DUMP_PATH = 'c:\\code\\tmp\\'
+import threading
+import configparser
+from pathlib import Path
 
 DEF_HEADER_IMAGE_NAME = 'YH-Image-Name'
 DEF_HEADER_RESULT = 'YH-Result'
 
+class stopThread (threading.Thread):
+    def __init__(self, server):
+        threading.Thread.__init__(self)
+        self._server = server
+
+    def run(self):
+        self._server.shutdown()
+
 class ImageReqHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        '''will call GET "/stop_server" to stop server'''
+        if self.path.startswith('/stop_server'):
+            print(time.asctime(), 'Server is going down!')
+            stopThread(httpd).start()
+            self.send_error(500)
+            return
+        
         '''only for GET test'''
         self.send_response(200)
         self.end_headers()
@@ -55,6 +69,13 @@ class ImageReqHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
 if __name__ == '__main__':
+    '''read config file for params'''
+    config = configparser.ConfigParser()
+    config.read(Path(__file__).parent.joinpath('config.ini'))
+    HOST_NAME = config.get('CONFIG', 'host')
+    PORT_NUMBER = int(config.get('CONFIG', 'port'))
+    DUMP_PATH = config.get('CONFIG', 'dump_path')
+
     server_class = HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), ImageReqHandler)
     print(time.asctime(), 'Server Starts - %s:%s' % (HOST_NAME, PORT_NUMBER))
